@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="author" content="Sanjay Krishna" />
+  <title>TasteCraft — Smart Recipe & Weekly Meal Planner</title>
+  
+  <!-- Google Fonts: Editorial Serif + Modern Clean Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Design System Stylesheet -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Top Navigation & Glassmorphic Brand Header -->
+  <header class="site-header">
+    <div class="container header-wrapper">
+      <a href="#" class="brand" onclick="switchView('recipes'); return false;">
+        <div class="brand-icon">🍳</div>
+        <div class="brand-text">
+          <h1>TasteCraft</h1>
+          <span class="brand-tag">Smart Meal Planner</span>
+        </div>
+      </a>
+
+      <!-- Navigation Tabs -->
+      <nav aria-label="Main Navigation">
+        <ul class="nav-links">
+          <li>
+            <button class="nav-btn active" data-view="recipes">
+              <span>Explore Recipes</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" data-view="planner">
+              <span>Weekly Planner</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" data-view="grocery">
+              <span>Grocery List</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" data-view="favorites">
+              <span>Favorites</span>
+              <span class="nav-badge" id="badge-fav-count">0</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section & Live Metrics -->
+  <section class="hero-section">
+    <div class="container">
+      <h2 class="hero-title">Plan Delicious Meals, <span>Effortlessly.</span></h2>
+      <p class="hero-subtitle">
+        Curate culinary recipes, schedule your weekly nutrition, and automatically generate smart categorized grocery shopping lists.
+      </p>
+
+      <!-- Live Counters -->
+      <div class="metrics-strip">
+        <div class="metric-pill">
+          <span>📚 Total Recipes:</span>
+          <strong id="metric-total-recipes">6</strong>
+        </div>
+        <div class="metric-pill">
+          <span>📅 Meals Scheduled:</span>
+          <strong id="metric-total-planned">0</strong>
+        </div>
+        <div class="metric-pill">
+          <span>🌿 Balanced Diet:</span>
+          <strong>100% Homemade</strong>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Application Body -->
+  <main class="container" style="flex: 1;">
+
+    <!-- VIEW 1: RECIPES EXPLORER / FAVORITES -->
+    <section id="view-recipes" class="view-panel active-view">
+      <!-- Search & Filters Strip -->
+      <div class="controls-card">
+        <div class="search-row">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input 
+              type="text" 
+              id="search-input" 
+              class="search-input" 
+              placeholder="Search by recipe name, ingredient (e.g. salmon, avocado), or keywords..." 
+            />
+          </div>
+          <button class="add-recipe-btn" id="btn-open-add-recipe">
+            <span>+</span> Add Custom Recipe
+          </button>
+        </div>
+
+        <div class="filter-row">
+          <div class="filter-group">
+            <span class="filter-label">Meal Type:</span>
+            <button class="filter-chip filter-category active" data-category="All">All</button>
+            <button class="filter-chip filter-category" data-category="Breakfast">Breakfast</button>
+            <button class="filter-chip filter-category" data-category="Lunch">Lunch</button>
+            <button class="filter-chip filter-category" data-category="Dinner">Dinner</button>
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-label">Dietary:</span>
+            <button class="filter-chip filter-diet active" data-diet="All">All Diets</button>
+            <button class="filter-chip filter-diet" data-diet="Vegetarian">Vegetarian</button>
+            <button class="filter-chip filter-diet" data-diet="Vegan">Vegan</button>
+            <button class="filter-chip filter-diet" data-diet="High-Protein">High Protein</button>
+            <button class="filter-chip filter-diet" data-diet="Quick (<20m)">Quick (<20m)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recipes Grid -->
+      <div class="recipes-grid" id="recipes-container">
+        <!-- Dynamically injected by app.js -->
+      </div>
+    </section>
+
+    <!-- VIEW 2: FAVORITES ALIAS VIEW -->
+    <section id="view-favorites" class="view-panel">
+      <div style="margin-bottom: 1.5rem;">
+        <h2 style="font-family: var(--font-heading); font-size: 1.85rem; color: var(--text-title);">❤️ Your Saved Favorite Recipes</h2>
+        <p style="color: var(--text-muted);">Quickly access your bookmarked culinary inspirations.</p>
+      </div>
+      <div class="recipes-grid" id="favorites-container">
+        <!-- Re-uses renderRecipes logic -->
+      </div>
+    </section>
+
+    <!-- VIEW 3: WEEKLY MEAL PLANNER -->
+    <section id="view-planner" class="view-panel">
+      <div class="planner-header">
+        <div class="planner-title">
+          <h2>Weekly Meal Planner Board</h2>
+          <p style="color: var(--text-muted); font-size: 0.92rem;">
+            Plan your daily breakfast, lunch, dinner, and snacks with real-time calorie tracking.
+          </p>
+        </div>
+        <div class="planner-actions">
+          <button class="btn-secondary" id="btn-print-plan">🖨️ Print / Export Plan</button>
+          <button class="btn-secondary" id="btn-clear-week" style="color: var(--danger);">🗑️ Clear Week</button>
+        </div>
+      </div>
+
+      <!-- 7-Day Interactive Columns -->
+      <div class="planner-grid" id="planner-grid-container">
+        <!-- Dynamically populated by app.js -->
+      </div>
+    </section>
+
+    <!-- VIEW 4: SMART GROCERY LIST -->
+    <section id="view-grocery" class="view-panel">
+      <div class="grocery-container">
+        <div class="grocery-card">
+          <div class="grocery-header">
+            <div>
+              <h2>Smart Grocery Shopping List</h2>
+              <p style="color: var(--text-muted); font-size: 0.92rem;">
+                Ingredients automatically aggregated from your weekly scheduled meals.
+              </p>
+            </div>
+            <button class="btn-secondary" id="btn-clear-checked-grocery">Clear Completed</button>
+          </div>
+
+          <!-- Add custom item form -->
+          <form class="grocery-add-form" id="form-add-grocery">
+            <input 
+              type="text" 
+              id="input-custom-grocery" 
+              class="grocery-input" 
+              placeholder="Add extra pantry item (e.g., Almond milk, Sea salt, Cinnamon)..." 
+              required 
+            />
+            <button type="submit" class="btn-primary">+ Add Item</button>
+          </form>
+
+          <!-- Grouped Grocery Items List -->
+          <div id="grocery-list-container">
+            <!-- Dynamically populated by app.js -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================================
+       MODALS
+       ========================================================================= -->
+
+  <!-- Modal 1: Recipe Detail & Dynamic Servings Scaler -->
+  <div class="modal-overlay" id="modal-recipe-detail" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <button class="modal-close-btn" aria-label="Close modal">✕</button>
+      <div id="detail-modal-body">
+        <!-- Rendered by app.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Assign Recipe to Meal Plan -->
+  <div class="modal-overlay" id="modal-assign-plan" role="dialog" aria-modal="true">
+    <div class="modal-content" style="max-width: 480px;">
+      <button class="modal-close-btn" aria-label="Close modal">✕</button>
+      <h3 style="font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--text-title);">
+        📅 Add to Meal Plan
+      </h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+        Choose the day and meal slot to assign this dish.
+      </p>
+
+      <form id="form-assign-plan">
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.4rem;">Select Recipe:</label>
+          <select id="plan-assign-recipe" class="search-input" style="padding-left: 1rem;" required>
+            <!-- Injected by app.js -->
+          </select>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.4rem;">Day of the Week:</label>
+          <select id="plan-assign-day" class="search-input" style="padding-left: 1rem;">
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+            <option value="Saturday">Saturday</option>
+            <option value="Sunday">Sunday</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.4rem;">Meal Time Slot:</label>
+          <select id="plan-assign-slot" class="search-input" style="padding-left: 1rem;">
+            <option value="breakfast">Breakfast</option>
+            <option value="lunch">Lunch</option>
+            <option value="dinner">Dinner</option>
+            <option value="snack">Snack</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 0.8rem;">
+          Confirm & Add to Schedule
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 3: Create Custom Recipe -->
+  <div class="modal-overlay" id="modal-add-recipe" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <button class="modal-close-btn" aria-label="Close modal">✕</button>
+      <h3 style="font-family: var(--font-heading); font-size: 1.65rem; margin-bottom: 0.35rem; color: var(--text-title);">
+        🍳 Add Your Custom Recipe
+      </h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+        Add your own culinary creation with prep time, ingredients, and instructions.
+      </p>
+
+      <form id="form-add-recipe">
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <label style="display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.4rem;">Recipe Title:</label>
+            <input type="text" id="recipe-form-title" class="search-input" style="padding-left: 1rem;" placeholder="e.g., Creamy Garlic Truffle Pasta" required />
+          </div>
+          <div>
+            <label style="display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.4rem;">Category:</label>
+            <select id="recipe-form-category" class="search-input" style="padding-left: 1rem;">
+              <option value="Breakfast">Breakfast</option>
+              <option value="Lunch">Lunch</option>
+              <option value="Dinner">Dinner</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <label style="display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.4rem;">Prep Time (minutes):</label>
+            <input type="number" id="recipe-form-time" class="search-input" style="padding-left: 1rem;" placeholder="20" min="1" max="300" required />
+          </div>
+          <div>
+            <label style="display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.4rem;">Calories (kcal):</label>
+            <input type="number" id="recipe-form-calories" class="search-input" style="padding-left: 1rem;" placeholder="450" min="50" max="3000" required />
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.4rem;">Image URL (optional):</label>
+          <input type="url" id="recipe-form-image" class="search-input" style="padding-left: 1rem;" placeholder="https://images.unsplash.com/..." />
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.4rem;">Short Description:</label>
+          <input type="text" id="recipe-form-desc" class="search-input" style="padding-left: 1rem;" placeholder="A quick one-line summary of what makes this dish special..." />
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.4rem;">Ingredients (one per line):</label>
+          <textarea id="recipe-form-ingredients" class="search-input" style="padding: 0.8rem 1rem; height: 90px; resize: vertical;" placeholder="1 cup Fettuccine&#10;2 cloves Garlic (minced)&#10;1 tbsp Olive Oil" required></textarea>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.4rem;">Cooking Instructions (one step per line):</label>
+          <textarea id="recipe-form-instructions" class="search-input" style="padding: 0.8rem 1rem; height: 100px; resize: vertical;" placeholder="Boil pasta in salted water until al dente.&#10;Saute garlic in olive oil until aromatic.&#10;Toss together and serve hot with fresh parsley." required></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 0.8rem;">
+          Save & Publish Recipe
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Footer with Academic Project Attributions -->
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div>
+        <p><strong>TasteCraft</strong> — Web Programming Course Project</p>
+        <p style="font-size: 0.8rem; margin-top: 0.25rem;">Built with Semantic HTML5, Modern CSS3 & Vanilla JavaScript (ES6+).</p>
+      </div>
+      <div class="footer-links">
+        <a href="#view-recipes" onclick="switchView('recipes'); return false;">Recipes</a>
+        <a href="#view-planner" onclick="switchView('planner'); return false;">Planner</a>
+        <a href="#view-grocery" onclick="switchView('grocery'); return false;">Grocery</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application Logic Scripts -->
+  <script src="recipes-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
